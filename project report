@@ -1,1 +1,22 @@
 https://docs.google.com/document/d/1AUR3gTn8YZuTbS4wLBSOhiMxaQkL-sfE/edit?usp=sharing&ouid=105091992100712858820&rtpof=true&sd=true
+Code:
+pi@raspberrypi:~ $ more airquality.py 
+import serial, time
+from Adafruit_IO import Client
+aio = Client ('AIO_user_name', 'AIO_key')
+ 
+ser = serial.Serial('/dev/ttyUSB0')
+ 
+while True:
+    data = []
+    for index in range(0,10):
+        datum = ser.read()
+        data.append(datum)
+     
+    pmtwofive = int.from_bytes(b''.join(data[2:4]), byteorder='little') / 10
+    aio.send('air-quality-pm-2-5', pmtwofive)
+    pmten = int.from_bytes(b''.join(data[4:6]), byteorder='little') / 10
+    aio.send('AIO_feed_name_2', pmten)
+    time.sleep(10)
+ 
+pi@raspberrypi:~ $ python3 airquality.py
